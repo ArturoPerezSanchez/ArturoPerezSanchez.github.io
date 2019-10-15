@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <link rel=stylesheet id="style" type="text/css" href="test.css" />
+</head>
+
+<body>
+  
+            <canvas id="tangram" width="900" height="900"></canvas>
+            
+    <!-- <div id="outerContainer">
+        <div class="yellow-triangle"></div>
+        <div class="red-triangle"></div>
+        <div class="lightblue-triangle"></div>
+        <div class="blue-triangle"></div>
+        <div class="orange-square"></div>
+        <div class="mallow-triangle"></div>
+        <div class="green-rhomboid"></div>
+    </div> -->
+
+</body>
+
+  
+
+  <script>
+        var mousePosition;
+        var isMouseDown;
+
+        //reference to the canvas element
+        var c = document.getElementById("tangram");
+        //reference to 2d context
+        var ctx = c.getContext("2d");
+
+        //add listeners
+        document.addEventListener('mousemove', move, false);
+        document.addEventListener("touchmove", move, false);
+        document.addEventListener('mousedown', setDraggable, false);
+        document.addEventListener("touchstart", setDraggable, false);
+        document.addEventListener('mouseup', setDraggable, false);
+        document.addEventListener("touchend", setDraggable, false);
+
+        //make some figures
+        var t1 = new Triangle(0, 0, [0,400], [200,200], "#fedd14");
+        var t2 = new Triangle(0, 0, [400,0], [200,200], "#f72a49");
+        var t3 = new Triangle(200, 400, [200, -200], [200, 0], "#50b9e8");
+        var t4 = new Triangle(300, 100, [100, -100], [100, 100], "#a250e2");
+        var t5 = new Triangle(200, 200, [100, 100], [-100, 100], "#428bca");
+        var c1 = new Square(200, 200, [100, 100], [200, 0], [100, -100], "#ff7c00");
+        var c2 = new Square(0, 400, [200, 0], [300, -100], [100, -100], "#8ecc23");
+        //initialise our figures
+        var figures = [c1, c2, t1, t2, t3, t4, t5 ];
+
+        //main draw method
+        function draw() {
+            //clear canvas
+            ctx.clearRect(0, 0, c.width, c.height);
+            drawFigures();
+        }
+
+        //draw figures
+        function drawFigures() {
+            for (var i = figures.length - 1; i >= 0; i--) {
+                figures[i].draw();
+            }
+        }
+
+        //key track of circle focus and focused index
+        var focused = {
+            key: 0,
+            state: false
+        }
+        function Triangle(x, y, v2, v3, fill) {
+            this.x = x;
+            this.y = y;
+            this.fill = fill;
+            this.offset = [0, 0]
+            
+            this.draw = function () {
+                this.x = this.x + this.offset[0];
+                this.y = this.y + this.offset[1];
+                this.v1 = [this.x, this.y]
+                this.v2 = [(this.x + v2[0]), (this.y + v2[1])]
+                this.v3 = [(this.x + v3[0]), (this.y + v3[1])]
+
+                ctx.beginPath();
+                ctx.lineTo(this.v1[0], this.v1[1]);
+                ctx.lineTo(this.v2[0], this.v2[1]);
+                ctx.lineTo(this.v3[0], this.v3[1]);
+                ctx.fillStyle = fill;
+                ctx.lineWidth = 3;
+                ctx.fill();
+            }
+        }
+
+        function Square(x, y, v2, v3, v4, fill) {
+            this.x = x;
+            this.y = y;
+            this.fill = fill;
+            this.offset = [0, 0]
+
+            this.draw = function () {
+                this.x = this.x + this.offset[0];
+                this.y = this.y + this.offset[1];
+                this.v1 = [this.x, this.y]
+                this.v2 = [(this.x + v2[0]), (this.y + v2[1])]
+                this.v3 = [(this.x + v3[0]), (this.y + v3[1])]
+                this.v4 = [(this.x + v4[0]), (this.y + v4[1])]
+                ctx.beginPath();
+                ctx.lineTo(this.v1[0], this.v1[1]);
+                ctx.lineTo(this.v2[0], this.v2[1]);
+                ctx.lineTo(this.v3[0], this.v3[1]);
+                ctx.lineTo(this.v4[0], this.v4[1]);
+                ctx.fillStyle = fill;
+                ctx.lineWidth = 3;
+                ctx.fill();
+            }
+        }
+
+
+        function move(e) {
+            if (!isMouseDown) {
+                return;
+            }
+            getMousePosition(e);
+            //if any circle is focused
+            if (focused.state) {
+                figures[focused.key].x = mousePosition.x;
+                figures[focused.key].y = mousePosition.y;
+                draw();
+                return;
+            }
+            //no circle currently focused check if circle is hovered
+            for (var i = 0; i < figures.length; i++) {
+                if (figures[i] instanceof Triangle){
+                    if (intersects(figures[i])) {
+                        figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
+                        figures[i].x = mousePosition.x;
+                        figures[i].y = mousePosition.y;
+                        if (0 >= figures.length) {
+                            var k = 0 - figures.length;
+                            while ((k--) + 1) {
+                                figures.push(undefined);
+                            }
+                        }
+                        figures.splice(0, 0, figures.splice(i, 1)[0]);
+                        focused.state = true;
+                        break;
+                    }
+                }
+                if (figures[i] instanceof Square){
+                    if (inside([[figures[i].x, figures[i].y], [figures[i].v2[0], figures[i].v2[1]], [figures[i].v3[0], figures[i].v3[1]], [figures[i].v4[0], figures[i].v4[1]]])) {
+                            figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
+                            figures[i].x = mousePosition.x;
+                            figures[i].y = mousePosition.y;
+                            if (0 >= figures.length) {
+                                var k = 0 - figures.length;
+                                while ((k--) + 1) {
+                                    figures.push(undefined);
+                                }
+                            }
+                            figures.splice(0, 0, figures.splice(i, 1)[0]);
+                            focused.state = true;
+                            break;
+                    }
+                }
+
+            }
+            draw();
+        }
+
+        //set mousedown state
+        function setDraggable(e) {
+            var t = e.type;
+            if (t === "mousedown" || t=== "touchstart") {
+                isMouseDown = true;
+            } else if (t === "mouseup" || t === "touchend") {
+                isMouseDown = false;
+                releaseFocus();
+            }
+        }
+
+        function releaseFocus() {
+            figures[focused.key].offset=[0,0]
+            focused.state = false;
+        }
+
+        function getMousePosition(e) {
+            var rect = c.getBoundingClientRect();
+            if (e.type === "touchmove"){
+                mousePosition = {
+                    x: Math.round(e.touches[0].clientX - rect.left),
+                    y: Math.round( e.touches[0].clientY - rect.top)
+                }  
+            } else {
+                mousePosition = {
+                    x: Math.round(e.x - rect.left),
+                    y: Math.round(e.y - rect.top)
+                }  
+            }
+        }
+
+        //detects whether the mouse cursor is between x and y relative to the radius specified
+        function intersects(triangle) {
+            var q = Math.sign((triangle.v1[0] - mousePosition.x)*(triangle.v2[1] - mousePosition.y) - (triangle.v2[0] - mousePosition.x)*(triangle.v1[1] - mousePosition.y))
+            var e = Math.sign((triangle.v2[0] - mousePosition.x)*(triangle.v3[1] - mousePosition.y) - (triangle.v3[0] - mousePosition.x)*(triangle.v2[1] - mousePosition.y))
+            var w = Math.sign((triangle.v3[0] - mousePosition.x)*(triangle.v1[1] - mousePosition.y) - (triangle.v1[0] - mousePosition.x)*(triangle.v3[1] - mousePosition.y))
+            return (q==w && w==e);
+        }
+
+        function inside(figure) {
+            var x =  mousePosition.x, y = mousePosition.y;
+
+            var inside = false;
+            for (var i = 0, j = figure.length - 1; i < figure.length; j = i++) {
+                var xi = figure[i][0], yi = figure[i][1];
+                var xj = figure[j][0], yj = figure[j][1];
+
+                var intersect = ((yi > y) != (yj > y))
+                    && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect) inside = !inside;
+            }
+
+            return inside;
+        };
+
+    draw();
+  </script>

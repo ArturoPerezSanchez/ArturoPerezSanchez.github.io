@@ -1,0 +1,110 @@
+canvas {
+	background-color: red;
+}
+.yellow-triangle{
+	margin-left: 0px;
+	margin-top: 0px;
+
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	border-left: 100px solid #fedd14;
+	border-top: 100px solid transparent;
+	border-right: 100px solid transparent;
+	border-bottom: 100px solid transparent;
+
+}
+
+.red-triangle{
+	margin-left: 0px;
+	margin-top: 0px;
+
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	border-left: 100px solid transparent;
+	border-top: 100px solid #f72a49;
+	border-right: 100px solid transparent;
+	border-bottom: 100px solid transparent;
+}
+
+.lightblue-triangle{
+	margin-left: 100px;
+	margin-top: 100px;
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	border-left: 50px solid transparent;
+	border-top: 50px solid transparent;
+	border-right: 50px solid #50b9e8;
+	border-bottom: 50px solid #50b9e8;
+}
+
+.blue-triangle{
+	margin-left: 100px;
+	margin-top: 0px;
+
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	border-left: 50px solid transparent;
+	border-top: 50px solid transparent;
+	border-right: 50px solid #a250e2;
+	border-bottom: 50px solid transparent;
+}
+
+.orange-square{
+	margin-left: 150px;
+	margin-top: 50px;
+
+	position: absolute;
+	width: 70.71px;
+	height: 70.71px;
+	background: #ff7c00;
+	transform: rotate(45deg);
+	transform-origin: 0% 0%;
+}
+
+.orange-square2 {
+	margin-left: 100px;
+	margin-top: 50px;
+
+	position: absolute;
+	height: 100px;
+	width: 100px;
+	background: #ff7c00;
+	clip-path: polygon(50px 0%, calc(100% - 50px) 0%, 100% 50px, 100% calc(100% - 50px), calc(100% - 50px) 100%, 50px 100%, 0% calc(100% - 50px), 0% 50px);
+}
+
+.mallow-triangle{
+	margin-left: 50px;
+	margin-top: 50px;
+
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	border-left: 50px solid transparent;
+	border-top: 50px solid transparent;
+	border-right: 50px solid transparent;
+	border-bottom: 50px solid #ef66ea;
+}
+
+.green-rhomboid{
+	margin-left: 50px;
+	margin-top: 150px;
+
+	position: absolute;
+	width: 100px;
+    height: 50px;
+    background: #8ecc23;
+    transform: skew(-45deg);
+    transform-origin: 0% 0%;
+
+}
+
+.no-ghost {
+    opacity:1.0;
+    -moz-opacity:1.0;
+    filter:alpha(opacity=100);
+}
+
