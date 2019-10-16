@@ -7,7 +7,8 @@
 
 <body>
   
-            <canvas id="tangram" width="900" height="900"></canvas>
+<!--     <div class="scrol" id="myDiv"> -->
+            <canvas id="tangram" width="900" 	></canvas>
             
     <!-- <div id="outerContainer">
         <div class="yellow-triangle"></div>
@@ -26,19 +27,24 @@
   <script>
         var mousePosition;
         var isMouseDown;
+        var isScrolling = false;
 
         //reference to the canvas element
         var c = document.getElementById("tangram");
+        c.height = window.innerHeight - 20;
+        c.width = window.innerWidth - 20;
+
         //reference to 2d context
         var ctx = c.getContext("2d");
-
+        ctx.translate(0, 0	)
         //add listeners
-        document.addEventListener('mousemove', move, false);
-        document.addEventListener("touchmove", move, false);
-        document.addEventListener('mousedown', setDraggable, false);
-        document.addEventListener("touchstart", setDraggable, false);
-        document.addEventListener('mouseup', setDraggable, false);
-        document.addEventListener("touchend", setDraggable, false);
+        document.addEventListener('mousemove', move);
+        document.addEventListener("touchmove", move);
+        document.addEventListener('mousedown', setDraggable);
+        document.addEventListener("touchstart", setDraggable);
+        document.addEventListener('mouseup', setDraggable);
+        document.addEventListener("touchend", setDraggable);
+        document.addEventListener("wheel", rotate);
 
         //make some figures
         var t1 = new Triangle(0, 0, [0,400], [200,200], "#fedd14");
@@ -49,7 +55,7 @@
         var c1 = new Square(200, 200, [100, 100], [200, 0], [100, -100], "#ff7c00");
         var c2 = new Square(0, 400, [200, 0], [300, -100], [100, -100], "#8ecc23");
         //initialise our figures
-        var figures = [c1, c2, t1, t2, t3, t4, t5 ];
+        var figures = [c1, c2, t1, t2, t3, t4, t5];
 
         //main draw method
         function draw() {
@@ -65,7 +71,7 @@
             }
         }
 
-        //key track of circle focus and focused index
+        //key track of figure focus and focused index
         var focused = {
             key: 0,
             state: false
@@ -75,21 +81,29 @@
             this.y = y;
             this.fill = fill;
             this.offset = [0, 0]
-            
+            this.rotation = (0);
             this.draw = function () {
+            	
                 this.x = this.x + this.offset[0];
-                this.y = this.y + this.offset[1];
-                this.v1 = [this.x, this.y]
-                this.v2 = [(this.x + v2[0]), (this.y + v2[1])]
-                this.v3 = [(this.x + v3[0]), (this.y + v3[1])]
+               	this,y = this.y + this.offset[1];
+
+                this.v1 = [this.x, this.y];
+
+                this.v2 = [(this.x + v2[0] * Math.cos(this.rotation) - (v2[1] * Math.sin(this.rotation))), 
+                		   (this.y + v2[1] * Math.cos(this.rotation) + (v2[0] * Math.sin(this.rotation)))];
+
+                this.v3 = [(this.x + v3[0] * Math.cos(this.rotation) - (v3[1] * Math.sin(this.rotation))),
+                		   (this.y + v3[1] * Math.cos(this.rotation) + (v3[0] * Math.sin(this.rotation)))];
 
                 ctx.beginPath();
                 ctx.lineTo(this.v1[0], this.v1[1]);
                 ctx.lineTo(this.v2[0], this.v2[1]);
                 ctx.lineTo(this.v3[0], this.v3[1]);
                 ctx.fillStyle = fill;
-                ctx.lineWidth = 3;
+
+				
                 ctx.fill();
+                ctx.closePath();
             }
         }
 
@@ -116,21 +130,82 @@
                 ctx.fill();
             }
         }
-
-
         function move(e) {
             if (!isMouseDown) {
                 return;
             }
             getMousePosition(e);
-            //if any circle is focused
-            if (focused.state) {
+            //if any figure is focused
+            if (focused.state && !isScrolling) {
+            	                console.log(isScrolling)
                 figures[focused.key].x = mousePosition.x;
                 figures[focused.key].y = mousePosition.y;
                 draw();
                 return;
+
             }
-            //no circle currently focused check if circle is hovered
+       		if (focused.state && isScrolling) {
+                figures[focused.key].x = mousePosition.x;
+                figures[focused.key].y = mousePosition.y;
+                figures[focused.key].rotation = (figures[focused.key].rotation + Math.PI /90);
+                draw();
+                			isScrolling = false;
+                return;
+            }
+            //no figure currently focused check if figure is hovered
+            for (var i = 0; i < figures.length; i++) {
+                if (figures[i] instanceof Triangle){
+                    if (intersects(figures[i])) {
+                        figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
+                        figures[i].x = mousePosition.x;
+                        figures[i].y = mousePosition.y;
+                        if (0 >= figures.length) {
+                            var k = 0 - figures.length;
+                            while ((k--) + 1) {
+                                figures.push(undefined);
+                            }
+                        }
+                        figures.splice(0, 0, figures.splice(i, 1)[0]);
+                        focused.state = true;
+                        break;
+                    }
+                }
+                if (figures[i] instanceof Square){
+                    if (inside([[figures[i].x, figures[i].y], [figures[i].v2[0], figures[i].v2[1]], [figures[i].v3[0], figures[i].v3[1]], [figures[i].v4[0], figures[i].v4[1]]])) {
+                            figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
+                            figures[i].x = mousePosition.x;
+                            figures[i].y = mousePosition.y;
+                            if (0 >= figures.length) {
+                                var k = 0 - figures.length;
+                                while ((k--) + 1) {
+                                    figures.push(undefined);
+                                }
+                            }
+                            figures.splice(0, 0, figures.splice(i, 1)[0]);
+                            focused.state = true;
+                            break;
+                    }
+                }
+
+            }
+            draw();
+        }
+
+        function rotate(e) {
+        	console.log()
+            if (!isMouseDown) {
+                return;
+            }
+            getMousePosition(e);
+            //if any figure is focused
+       		if (focused.state) {
+                figures[focused.key].x = mousePosition.x;
+                figures[focused.key].y = mousePosition.y;
+                figures[focused.key].rotation = (figures[focused.key].rotation + (Math.PI /12)*Math.sign(e.deltaY));
+                draw();
+                return;
+            }
+            //no figure currently focused check if figure is hovered
             for (var i = 0; i < figures.length; i++) {
                 if (figures[i] instanceof Triangle){
                     if (intersects(figures[i])) {
@@ -178,6 +253,12 @@
                 isMouseDown = false;
                 releaseFocus();
             }
+        }
+
+        function setScroll(e) {
+        	isScrolling = true;
+			move()
+
         }
 
         function releaseFocus() {
