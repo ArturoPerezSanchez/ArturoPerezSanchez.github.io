@@ -27,7 +27,6 @@
   <script>
         var mousePosition;
         var isMouseDown;
-        var isScrolling = false;
 
         //reference to the canvas element
         var c = document.getElementById("tangram");
@@ -47,15 +46,16 @@
         document.addEventListener("wheel", rotate);
 
         //make some figures
-        var t1 = new Triangle(0, 0, [0,400], [200,200], "#fedd14");
-        var t2 = new Triangle(0, 0, [400,0], [200,200], "#f72a49");
-        var t3 = new Triangle(200, 400, [200, -200], [200, 0], "#50b9e8");
-        var t4 = new Triangle(300, 100, [100, -100], [100, 100], "#a250e2");
-        var t5 = new Triangle(200, 200, [100, 100], [-100, 100], "#428bca");
-        var c1 = new Square(200, 200, [100, 100], [200, 0], [100, -100], "#ff7c00");
-        var c2 = new Square(0, 400, [200, 0], [300, -100], [100, -100], "#8ecc23");
+
+        var t1 = new Triangle(75, 200, [-75 , -200], [125, 0], [-75,200], "#fedd14");
+        var t2 = new Triangle(200, 75, [-200 , -75], [200, -75], [0,125], "#f72a49");
+        var t3 = new Triangle(350, 350, [-150 , 50], [50, 50], [50, -150], "#50b9e8");
+        var t4 = new Triangle(350, 100, [-50 , 0], [50, -100], [50, 100], "#a250e2");
+        var t5 = new Triangle(200, 250, [0 , -50], [100, 50], [-100, 50], "#428bca");
+        var c1 = new Square(300, 200, [-100, 0], [0, 100], [100, 0], [0, -100], "#ff7c00");
+        var c2 = new Square(150, 350, [-150, 50], [50, 50], [150, -50], [-50, -50], "#8ecc23");
         //initialise our figures
-        var figures = [c1, c2, t1, t2, t3, t4, t5];
+        var figures = [t1, t2, t3, t4, t5, c1, c2];
 
         //main draw method
         function draw() {
@@ -76,80 +76,86 @@
             key: 0,
             state: false
         }
-        function Triangle(x, y, v2, v3, fill) {
+        function Triangle(x, y, v1, v2, v3, fill) {
+            this.x = x;
+            this.y = y;
+            this.fill = fill;
+            this.offset = [0, 0]
+            this.rotation = (0);
+
+            this.draw = function () {
+            	
+                this.x = this.x + this.offset[0];
+               	this.y = this.y + this.offset[1];
+               	this.centro = [this.x, this.y];
+
+                this.v1 = [this.centro[0] + v1[0] * Math.cos(this.rotation) - v1[1] * Math.sin(this.rotation), 
+                		   this.centro[1] + v1[0] * Math.sin(this.rotation) + v1[1] * Math.cos(this.rotation)];
+
+                this.v2 = [this.centro[0] + v2[0] * Math.cos(this.rotation) - v2[1] * Math.sin(this.rotation),
+                		   this.centro[1] + v2[0] * Math.sin(this.rotation) + v2[1] * Math.cos(this.rotation)];
+
+                this.v3 = [this.centro[0] + v3[0] * Math.cos(this.rotation) - v3[1] * Math.sin(this.rotation), 
+                		   this.centro[1] + v3[0] * Math.sin(this.rotation) + v3[1] * Math.cos(this.rotation)];
+
+                ctx.beginPath();
+                ctx.lineTo(this.v1[0], this.v1[1]);
+                ctx.lineTo(this.v2[0], this.v2[1]);
+                ctx.lineTo(this.v3[0], this.v3[1]);
+                ctx.fillStyle = fill;
+                ctx.fill();
+
+                ctx.closePath();	
+                ctx.fill();
+            }
+        }
+
+        function Square(x, y, v1, v2, v3, v4, fill) {
             this.x = x;
             this.y = y;
             this.fill = fill;
             this.offset = [0, 0]
             this.rotation = (0);
             this.draw = function () {
-            	
                 this.x = this.x + this.offset[0];
-               	this,y = this.y + this.offset[1];
+               	this.y = this.y + this.offset[1];
+               	this.centro = [this.x, this.y];
 
-                this.v1 = [this.x, this.y];
+                this.v1 = [this.centro[0] + v1[0] * Math.cos(this.rotation) - v1[1] * Math.sin(this.rotation), 
+                		   this.centro[1] + v1[0] * Math.sin(this.rotation) + v1[1] * Math.cos(this.rotation)];
 
-                this.v2 = [(this.x + v2[0] * Math.cos(this.rotation) - (v2[1] * Math.sin(this.rotation))), 
-                		   (this.y + v2[1] * Math.cos(this.rotation) + (v2[0] * Math.sin(this.rotation)))];
+                this.v2 = [this.centro[0] + v2[0] * Math.cos(this.rotation) - v2[1] * Math.sin(this.rotation),
+                		   this.centro[1] + v2[0] * Math.sin(this.rotation) + v2[1] * Math.cos(this.rotation)];
 
-                this.v3 = [(this.x + v3[0] * Math.cos(this.rotation) - (v3[1] * Math.sin(this.rotation))),
-                		   (this.y + v3[1] * Math.cos(this.rotation) + (v3[0] * Math.sin(this.rotation)))];
+                this.v3 = [this.centro[0] + v3[0] * Math.cos(this.rotation) - v3[1] * Math.sin(this.rotation), 
+                		   this.centro[1] + v3[0] * Math.sin(this.rotation) + v3[1] * Math.cos(this.rotation)];
 
-                ctx.beginPath();
-                ctx.lineTo(this.v1[0], this.v1[1]);
-                ctx.lineTo(this.v2[0], this.v2[1]);
-                ctx.lineTo(this.v3[0], this.v3[1]);
-                ctx.fillStyle = fill;
+             	this.v4 = [this.centro[0] + v4[0] * Math.cos(this.rotation) - v4[1] * Math.sin(this.rotation), 
+                		   this.centro[1] + v4[0] * Math.sin(this.rotation) + v4[1] * Math.cos(this.rotation)];
 
-				
-                ctx.fill();
-                ctx.closePath();
-            }
-        }
-
-        function Square(x, y, v2, v3, v4, fill) {
-            this.x = x;
-            this.y = y;
-            this.fill = fill;
-            this.offset = [0, 0]
-
-            this.draw = function () {
-                this.x = this.x + this.offset[0];
-                this.y = this.y + this.offset[1];
-                this.v1 = [this.x, this.y]
-                this.v2 = [(this.x + v2[0]), (this.y + v2[1])]
-                this.v3 = [(this.x + v3[0]), (this.y + v3[1])]
-                this.v4 = [(this.x + v4[0]), (this.y + v4[1])]
                 ctx.beginPath();
                 ctx.lineTo(this.v1[0], this.v1[1]);
                 ctx.lineTo(this.v2[0], this.v2[1]);
                 ctx.lineTo(this.v3[0], this.v3[1]);
                 ctx.lineTo(this.v4[0], this.v4[1]);
                 ctx.fillStyle = fill;
-                ctx.lineWidth = 3;
                 ctx.fill();
+                ctx.closePath();	
             }
         }
         function move(e) {
             if (!isMouseDown) {
                 return;
             }
+            if (e.touches.length == 2){
+            	rotate2(e);
+            }
             getMousePosition(e);
             //if any figure is focused
-            if (focused.state && !isScrolling) {
-            	                console.log(isScrolling)
+            if (focused.state) {
                 figures[focused.key].x = mousePosition.x;
                 figures[focused.key].y = mousePosition.y;
                 draw();
-                return;
-
-            }
-       		if (focused.state && isScrolling) {
-                figures[focused.key].x = mousePosition.x;
-                figures[focused.key].y = mousePosition.y;
-                figures[focused.key].rotation = (figures[focused.key].rotation + Math.PI /90);
-                draw();
-                			isScrolling = false;
                 return;
             }
             //no figure currently focused check if figure is hovered
@@ -171,7 +177,7 @@
                     }
                 }
                 if (figures[i] instanceof Square){
-                    if (inside([[figures[i].x, figures[i].y], [figures[i].v2[0], figures[i].v2[1]], [figures[i].v3[0], figures[i].v3[1]], [figures[i].v4[0], figures[i].v4[1]]])) {
+                    if (inside([[figures[i].v1[0], figures[i].v1[1]], [figures[i].v2[0], figures[i].v2[1]], [figures[i].v3[0], figures[i].v3[1]], [figures[i].v4[0], figures[i].v4[1]]])) {
                             figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
                             figures[i].x = mousePosition.x;
                             figures[i].y = mousePosition.y;
@@ -192,7 +198,6 @@
         }
 
         function rotate(e) {
-        	console.log()
             if (!isMouseDown) {
                 return;
             }
@@ -205,10 +210,16 @@
                 draw();
                 return;
             }
+
             //no figure currently focused check if figure is hovered
             for (var i = 0; i < figures.length; i++) {
-                if (figures[i] instanceof Triangle){
-                    if (intersects(figures[i])) {
+	                if (figures[i] instanceof Triangle){
+	                	vertex = [[figures[i].v1], [figures[i].v2], [figures[i].v3]];
+	                 } else {
+	                 	vertex = [[figures[i].v1], [figures[i].v2], [figures[i].v3], [figures[i].v4]];
+	                 }
+                
+                if (inside(vertex)) {
                         figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
                         figures[i].x = mousePosition.x;
                         figures[i].y = mousePosition.y;
@@ -221,24 +232,51 @@
                         figures.splice(0, 0, figures.splice(i, 1)[0]);
                         focused.state = true;
                         break;
-                    }
                 }
-                if (figures[i] instanceof Square){
-                    if (inside([[figures[i].x, figures[i].y], [figures[i].v2[0], figures[i].v2[1]], [figures[i].v3[0], figures[i].v3[1]], [figures[i].v4[0], figures[i].v4[1]]])) {
-                            figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
-                            figures[i].x = mousePosition.x;
-                            figures[i].y = mousePosition.y;
-                            if (0 >= figures.length) {
-                                var k = 0 - figures.length;
-                                while ((k--) + 1) {
-                                    figures.push(undefined);
-                                }
+                
+
+            }
+            draw();
+        }
+
+                function rotate2(event) {
+            if (!isMouseDown) {
+                return;
+            }
+            getMousePosition(e);
+            //if any figure is focused
+       		if (focused.state) {
+                figures[focused.key].x = mousePosition.x;
+                figures[focused.key].y = mousePosition.y;
+                figures[focused.key].rotation = (figures[focused.key].rotation + Math.arctan2(event.touches[0].pageY - event.touches[1].pageY,
+      event.touches[0].pageX - event.touches[1].pageX));
+                draw();
+                return;
+            }
+
+            //no figure currently focused check if figure is hovered
+            for (var i = 0; i < figures.length; i++) {
+	                if (figures[i] instanceof Triangle){
+	                	vertex = [[figures[i].v1], [figures[i].v2], [figures[i].v3]];
+	                 } else {
+	                 	vertex = [[figures[i].v1], [figures[i].v2], [figures[i].v3], [figures[i].v4]];
+	                 }
+                
+                if (inside(vertex)) {
+                        figures[i].offset = [(figures[i].x - mousePosition.x), (figures[i].y - mousePosition.y)]
+                        figures[i].x = mousePosition.x;
+                        figures[i].y = mousePosition.y;
+                        if (0 >= figures.length) {
+                            var k = 0 - figures.length;
+                            while ((k--) + 1) {
+                                figures.push(undefined);
                             }
-                            figures.splice(0, 0, figures.splice(i, 1)[0]);
-                            focused.state = true;
-                            break;
-                    }
+                        }
+                        figures.splice(0, 0, figures.splice(i, 1)[0]);
+                        focused.state = true;
+                        break;
                 }
+                
 
             }
             draw();
@@ -253,13 +291,7 @@
                 isMouseDown = false;
                 releaseFocus();
             }
-        }
-
-        function setScroll(e) {
-        	isScrolling = true;
-			move()
-
-        }
+        }	
 
         function releaseFocus() {
             figures[focused.key].offset=[0,0]
