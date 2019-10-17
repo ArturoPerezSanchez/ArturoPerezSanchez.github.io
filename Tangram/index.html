@@ -147,8 +147,11 @@
             if (!isMouseDown) {
                 return;
             }
-            if (e.touches.length == 2){
-            	rotate2(e);
+            if (e.touches){
+                if(e.touches.length > 1){
+                    rotate2(e);
+                    return;
+                }             
             }
             getMousePosition(e);
             //if any figure is focused
