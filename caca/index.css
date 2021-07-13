@@ -1,0 +1,42 @@
+
+
+body {
+	background: #ff00ff;
+	overflow: hidden;
+	    margin: inherit;
+}
+
+img { 
+	width:  16.6666%;
+	height: 315px;
+	opacity: .6;
+	margin: -2px;
+	padding: 0px;
+}
+
+.birdo {
+	width:  33.33333%;
+}
+
+
+.logo-container{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 800px;
+    height: 600px;
+    margin-left: -400px;
+	margin-top: -300px;
+}
+
+.logo {
+
+	opacity: 1;
+	width:  inherit;
+	height: inherit;
+	z-index: 1;
+}
+
+.background{
+	position: absolute;
+}
