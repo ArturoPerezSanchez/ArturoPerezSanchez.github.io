@@ -3,15 +3,20 @@
 body {
 	background: #ff00ff;
 	overflow: hidden;
-	    margin: inherit;
+	margin: inherit;
 }
 
 img { 
 	width:  16.6666%;
 	height: 315px;
-	opacity: .6;
+	opacity: .5;
 	margin: -2px;
 	padding: 0px;
+
+}
+
+img:hover {
+  opacity: 1;
 }
 
 .birdo {
@@ -30,13 +35,12 @@ img {
 }
 
 .logo {
-
 	opacity: 1;
 	width:  inherit;
 	height: inherit;
-	z-index: 1;
 }
 
 .background{
 	position: absolute;
 }
+
