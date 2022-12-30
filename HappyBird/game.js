@@ -113,7 +113,7 @@ function update(elapsedTime) {
   }
   // Update the bird's position
   bird.y += bird.velocity;
-  bird.velocity += canvas.width > 600 ? GRAVITY : GRAVITY/2;
+  bird.velocity += canvas.width > 600 ? GRAVITY : GRAVITY/4;
 
   // Generate new pipes
   if ((frame % PIPE_FREQUENCY == 0 && canvas.width > 600) || (frame % Math.floor(PIPE_FREQUENCY*2.5) == 0 && canvas.width < 600)) {
@@ -391,10 +391,15 @@ function main() {
     // Calculate elapsed time
     let elapsedTime = time - lastTime;
     lastTime = time;
-
+    
     // Update and draw the game
-    update(elapsedTime);
-    frame++;
+
+    // Limited to 60 fps
+    if(elapsedTime > 16){
+      update(elapsedTime);
+      frame++;
+    }
+
     if (!gameOver) {
     	draw();
   	}
