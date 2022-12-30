@@ -19,12 +19,12 @@ let backgroundSound;
 let musicStarted;
 let pipesTextures;
 let background;
+let pipeWidth;
 
 // Game constants
 const GRAVITY = 0.25;
-const JUMP_FORCE = 5;
-const PIPE_SPEED = 6;
-const PIPE_WIDTH = 40;
+const JUMP_FORCE = 5; 
+const PIPE_SPEED = 0.01; // percentage of the screen moved per tick, around 1% is playable
 const PIPE_FREQUENCY = 70;
 const PIPE_GAP = 120;
 
@@ -47,13 +47,13 @@ function init() {
   score = 0;
   gameOver = false;
   frame = 0;	
-
+  pipeWidth = canvas.width > 600 ? 40 : 20;
   // Create the bird object
   bird = {
-    x: 120, // Initial x position
-    y: 250, // Initial y position
-    width: 45, // Width of the bird
-    height: 25, // Height of the bird
+    x: canvas.width*0.1, // Initial x position
+    y: canvas.height/2, // Initial y position
+    width: canvas.width > 600 ? 45 : 20, // Width of the bird
+    height: canvas.width > 600 ? 25 : 11, // Height of the bird
     velocity: 0 // Initial vertical velocity
   };
 
@@ -105,6 +105,7 @@ function update(elapsedTime) {
 	    let restartButton = document.createElement("button");
 	    restartButton.id = "restart-button";
 	    restartButton.innerHTML = restartText;
+      restartButton.style.top = window.innerHeight*0.12 + canvas.height/2 + 80;
 	    restartButton.addEventListener("click", restartGame);
 	    document.body.appendChild(restartButton);   
 	 }
@@ -121,7 +122,7 @@ function update(elapsedTime) {
 
   // Update the pipes' positions
   for (let pipe of pipes) {
-    pipe.x -= PIPE_SPEED;
+    pipe.x -= Math.min(10, Math.floor(canvas.width*PIPE_SPEED));
   }
 
   // Check for collisions
@@ -156,14 +157,14 @@ function generatePipe() {
   let topPipe = {
     x: canvas.width,
     y: 0,
-    width: PIPE_WIDTH,
+    width: pipeWidth,
     height: topHeight,
     img: pipesTextures[textureNumber]
   };
   let bottomPipe = {
     x: canvas.width,
     y: topHeight + PIPE_GAP,
-    width: PIPE_WIDTH,
+    width: pipeWidth,
     height: canvas.height - topHeight + PIPE_GAP,
     img: pipesTextures[textureNumber]
   };
@@ -175,8 +176,10 @@ function generatePipe() {
 function draw() {
   // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-
+  let rotationAngle = (bird.velocity/20)*(Math.PI/2)
+  let scoreText = "Score: " + score;
+  let textWidth = ctx.measureText(scoreText).width;
+  let birdImg;
   //Select the bird image depending on the frame to make the animation
   if(frame%30<=10){
     birdImg = birdImg0;
@@ -189,44 +192,48 @@ function draw() {
   }
 
   // Draw the background
-  backgroundPosition -=PIPE_SPEED
+  backgroundPosition -= Math.min(8, Math.floor(canvas.width*PIPE_SPEED));
   if(backgroundPosition <= -canvas.height){
     backgroundPosition += canvas.height
   }
-
   for (let i=0; i<=Math.ceil(canvas.width/canvas.height); i++){
     ctx.drawImage(background, backgroundPosition + i*canvas.height, 0, canvas.height, canvas.height);
   }
 
-
   // Draw the pipes
   for (let pipe of pipes) {
-    for (let j=0; j<Math.floor(pipe.height/PIPE_WIDTH); j++){
-      ctx.drawImage(pipe.img,  pipe.x, pipe.y + j*PIPE_WIDTH, PIPE_WIDTH, PIPE_WIDTH);
+    for (let j=0; j<Math.floor(pipe.height/pipeWidth); j++){
+      ctx.drawImage(pipe.img,  pipe.x, pipe.y + j*pipeWidth, pipeWidth, pipeWidth);
     }
-    ctx.drawImage(pipe.img, pipe.x, pipe.y + PIPE_WIDTH*Math.floor(pipe.height/PIPE_WIDTH), PIPE_WIDTH, pipe.height%PIPE_WIDTH);
+    ctx.drawImage(pipe.img, pipe.x, pipe.y + pipeWidth*Math.floor(pipe.height/pipeWidth), pipeWidth, pipe.height%pipeWidth);
     flowerImg = new Image();
     flowerImg.src = "assets/pipe_flower.png";
-    ctx.drawImage(flowerImg, pipe.x-30, pipe.y + pipe.height - 30, PIPE_WIDTH+60, PIPE_WIDTH);
-    ctx.drawImage(flowerImg, pipe.x-30, pipe.y - 15, PIPE_WIDTH+60, PIPE_WIDTH);
-    ctx.drawImage(flowerImg, pipe.x-30, canvas.height - 30, PIPE_WIDTH+60, PIPE_WIDTH);
+    flowerOversize = canvas.width > 600 ? 30 : 15;
+    ctx.drawImage(flowerImg, pipe.x- flowerOversize, pipe.y + pipe.height -  flowerOversize, pipeWidth+flowerOversize*2, pipeWidth);
+    ctx.drawImage(flowerImg, pipe.x- flowerOversize, pipe.y - flowerOversize/2, pipeWidth+flowerOversize*2, pipeWidth);
+    ctx.drawImage(flowerImg, pipe.x- flowerOversize, canvas.height -  flowerOversize, pipeWidth+flowerOversize*2, pipeWidth);
   }
 
   // Draw the hitbox
   //ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
 
   // Draw the bird
-  let rotationAngle = (bird.velocity/20)*(Math.PI/2)
-  ctx.translate(bird.x +25, bird.y + 5);
-  ctx.rotate(rotationAngle);
-  ctx.drawImage(birdImg, -32, -30, 64, 61);
-  ctx.rotate(-rotationAngle);
-  ctx.translate(-(bird.x +25), -(bird.y + 5));
-
+  if(canvas.width > 600){
+    ctx.font = "24px sans-serif";
+    ctx.translate(bird.x +25, bird.y + 5);
+    ctx.rotate(rotationAngle);
+    ctx.drawImage(birdImg, -32, -30, 64, 61);
+    ctx.rotate(-rotationAngle);
+    ctx.translate(-(bird.x +25), -(bird.y + 5));
+  } else {
+    ctx.font = "16px sans-serif";
+    ctx.translate(bird.x +12, bird.y + 2);
+    ctx.rotate(rotationAngle);
+    ctx.drawImage(birdImg, -16, -15, 32, 30);
+    ctx.rotate(-rotationAngle);
+    ctx.translate(-(bird.x +12), -(bird.y + 2));
+  }
   //Draw the score box  
-  ctx.font = "24px sans-serif";
-  let scoreText = "Score: " + score;
-  let textWidth = ctx.measureText(scoreText).width;
   ctx.beginPath();
   ctx.roundRect(canvas.width/2 - textWidth/2 - 30, 8, textWidth + 60 , 40, 30);
   ctx.strokeStyle = "black";
@@ -237,31 +244,32 @@ function draw() {
 
   // Draw the score
   ctx.fillStyle = "black";
-  ctx.textAlign = "left";
+  ctx.textAlign = "center";
   ctx.globalAlpha = 1;
-  ctx.fillText(scoreText, canvas.width/2 - textWidth/2, 35);
-
+  ctx.fillText(scoreText, canvas.width/2, 35);
 
   // Draw the borders
-  ctx.globalCompositeOperation='source-atop';
+  if(canvas.width > 500){
+    ctx.globalCompositeOperation='source-atop';
 
-  // Draw the left border
-  ctx.beginPath();
-  let gradient = ctx.createLinearGradient(0, 0, 30, 0);
-  gradient.addColorStop(0, "darkgreen");
-  gradient.addColorStop(1, "transparent"); 
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0,0, 30, canvas.height);
+    // Draw the left border
+    ctx.beginPath();
+    let gradient = ctx.createLinearGradient(0, 0, 30, 0);
+    gradient.addColorStop(0, "darkgreen");
+    gradient.addColorStop(1, "transparent"); 
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0,0, 30, canvas.height);
 
-  // Draw the right border
-  ctx.beginPath();
-  gradient = ctx.createLinearGradient(canvas.width, 0, canvas.width-canvas.width/12, 0);
-  gradient.addColorStop(0, "darkgreen");
-  gradient.addColorStop(1, "transparent");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(canvas.width-canvas.width/12,0, canvas.width, canvas.height);
+    // Draw the right border
+    ctx.beginPath();
+    gradient = ctx.createLinearGradient(canvas.width, 0, canvas.width-30, 0);
+    gradient.addColorStop(0, "darkgreen");
+    gradient.addColorStop(1, "transparent");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(canvas.width-30,0, canvas.width, canvas.height);
 
-  ctx.globalCompositeOperation='source-over';
+    ctx.globalCompositeOperation='source-over';
+  }
 }
 
 function jump() {
@@ -295,8 +303,8 @@ function handleInput() {
 
 function restartGame() {
   //Chech for resize
-  canvas.width = window.innerWidth*0.9;
-  canvas.height = window.innerHeight*0.8;
+  canvas.width = window.innerWidth > 600 ? window.innerWidth*0.9 : window.innerWidth;
+  canvas.height = Math.min(canvas.width*1.4, window.innerHeight*0.8);
 
   // Reset game state
   init()
@@ -323,7 +331,7 @@ function checkCollisions() {
 // Helper function to check for collision between two objects
 function collides(a, b) {
   return (
-    a.x < b.x + PIPE_WIDTH &&
+    a.x < b.x + pipeWidth &&
     a.x + a.width > b.x &&
     a.y < b.y + b.height &&
     a.y + a.height > b.y
@@ -364,8 +372,10 @@ function main() {
   // Set up the canvas and context
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth*0.9;
-  canvas.height = window.innerHeight*0.8;
+  
+  // Set canvas width and height
+  canvas.width = window.innerWidth > 600 ? window.innerWidth*0.9 : window.innerWidth;
+  canvas.height = Math.min(canvas.width*1.4, window.innerHeight*0.8);
 
   // Set the footer text depending on the browser language
   document.querySelector("footer").textContent = footerText;
@@ -398,8 +408,8 @@ function main() {
 }
 
 window.addEventListener('resize', function() {
-  canvas.width = window.innerWidth*0.9;
-  canvas.height = window.innerHeight*0.8;
+  canvas.width = window.innerWidth > 600 ? window.innerWidth*0.9 : window.innerWidth;
+  canvas.height = Math.min(canvas.width*1.4, window.innerHeight*0.8);
   draw();
   if(gameOver){
     drawGameOverMessage()
