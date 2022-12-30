@@ -111,6 +111,7 @@ footer {
   width: 100vw;
   height: 3vh;
   padding: 2vh;
+  padding-left: 0px;
   text-align: center;
   background: #333;
   font-family: sans-serif;
