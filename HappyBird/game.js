@@ -23,7 +23,7 @@ let pipeWidth;
 
 // Game constants
 const JUMP_FORCE = 5; 
-const PIPE_SPEED = 0.01; // percentage of the screen moving left per tick, around 1% is playable in all devices
+const PIPE_SPEED = 0.005; // percentage of the screen moving left per tick, around .5% and 1% is playable in all devices
 const GRAVITY = 0.25;
 const PIPE_FREQUENCY = 70;
 const PIPE_GAP = 120;
@@ -116,7 +116,7 @@ function update(elapsedTime) {
   bird.velocity += canvas.width > 600 ? GRAVITY : GRAVITY/2;
 
   // Generate new pipes
-  if (frame % PIPE_FREQUENCY == 0) {
+  if ((frame % PIPE_FREQUENCY == 0 && canvas.width > 600) || (frame % Math.floor(PIPE_FREQUENCY*2.5) == 0 && canvas.width < 600)) {
     generatePipe();
   }
 
@@ -283,7 +283,7 @@ function jump() {
   }
 
   // Update the bird's velocity
-  bird.velocity = canvas.width > 600 ? -JUMP_FORCE : -JUMP_FORCE/2;
+  bird.velocity = canvas.width > 600 ? -JUMP_FORCE : -JUMP_FORCE+2;
 }
 
 function handleInput() {
