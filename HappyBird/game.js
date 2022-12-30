@@ -390,7 +390,7 @@ function main() {
   function gameLoop(time) {
     // Calculate elapsed time
     let elapsedTime = time - lastTime;
-    lastTime = time;
+
     
     // Update and draw the game
 
@@ -398,11 +398,13 @@ function main() {
     if(elapsedTime > 16){
       update(elapsedTime);
       frame++;
+      if (!gameOver) {
+        draw();
+      }
+      lastTime = time;
     }
 
-    if (!gameOver) {
-    	draw();
-  	}
+
 
     // Request the next frame
     requestAnimationFrame(gameLoop);
