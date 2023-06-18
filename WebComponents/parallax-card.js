@@ -4,8 +4,8 @@ const g=function(){const r=document.createElement("link").relList;if(r&&r.suppor
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 350px;
-        height: 450px;
+        width: 250px;
+        height: 350px;
         transform-style: preserve-3d;
         perspective: 1000px;
         position: relative;
@@ -54,16 +54,17 @@ const g=function(){const r=document.createElement("link").relList;if(r&&r.suppor
         margin: 0;
         text-shadow: 0 0 10px #000a;
         color: #fff;
+        font-size: 26px;
       }
 
       .sticker {
         transform: rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg)) translateZ(42px);
-        width: 300px;
-        height: 300px;
+        width: 250px;
+        height: 250px;
       }
 
       .description {
-        font-size: 26px;
+        font-size: 20px;
         color: #fff;
         font-weight: 300;
         text-shadow: 2px 2px 2px #000;
@@ -96,10 +97,6 @@ const g=function(){const r=document.createElement("link").relList;if(r&&r.suppor
       }
 
       @media only screen and (max-width: 825px) {
-        .container-card {
-          width: 250px;
-          height: 320px;
-        }
         .description {
           font-size: 18px;
         }
