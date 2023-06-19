@@ -1,10 +1,10 @@
-const g=function(){const r=document.createElement("link").relList;if(r&&r.supports&&r.supports("modulepreload"))return;for(const t of document.querySelectorAll('link[rel="modulepreload"]'))i(t);new MutationObserver(t=>{for(const e of t)if(e.type==="childList")for(const s of e.addedNodes)s.tagName==="LINK"&&s.rel==="modulepreload"&&i(s)}).observe(document,{childList:!0,subtree:!0});function o(t){const e={};return t.integrity&&(e.integrity=t.integrity),t.referrerpolicy&&(e.referrerPolicy=t.referrerpolicy),t.crossorigin==="use-credentials"?e.credentials="include":t.crossorigin==="anonymous"?e.credentials="omit":e.credentials="same-origin",e}function i(t){if(t.ep)return;t.ep=!0;const e=o(t);fetch(t.href,e)}};g();class n extends HTMLElement{constructor(){super(),this.attachShadow({mode:"open"})}static get styles(){return`
+const h=function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))i(s);new MutationObserver(s=>{for(const t of s)if(t.type==="childList")for(const r of t.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&i(r)}).observe(document,{childList:!0,subtree:!0});function o(s){const t={};return s.integrity&&(t.integrity=s.integrity),s.referrerpolicy&&(t.referrerPolicy=s.referrerpolicy),s.crossorigin==="use-credentials"?t.credentials="include":s.crossorigin==="anonymous"?t.credentials="omit":t.credentials="same-origin",t}function i(s){if(s.ep)return;s.ep=!0;const t=o(s);fetch(s.href,t)}};h();class a extends HTMLElement{constructor(){super(),this.attachShadow({mode:"open"})}static get styles(){return`
 
       .container-card {
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 250px;
+        width: 220px;
         height: 350px;
         transform-style: preserve-3d;
         perspective: 1000px;
@@ -55,6 +55,7 @@ const g=function(){const r=document.createElement("link").relList;if(r&&r.suppor
         text-shadow: 0 0 10px #000a;
         color: #fff;
         font-size: 26px;
+        text-align:center;
       }
 
       .sticker {
@@ -64,7 +65,7 @@ const g=function(){const r=document.createElement("link").relList;if(r&&r.suppor
       }
 
       .description {
-        font-size: 20px;
+        font-size: 18px;
         color: #fff;
         font-weight: 300;
         text-shadow: 2px 2px 2px #000;
@@ -113,12 +114,12 @@ const g=function(){const r=document.createElement("link").relList;if(r&&r.suppor
           height: 200px;
         }
       }
-    `}connectedCallback(){this.title=this.getAttribute("title"),this.src=this.getAttribute("src"),this.background=this.getAttribute("background"),this.description=this.getAttribute("description"),this.style.setProperty("--background-image",`url(${this.background})`),this.render(),this.init()}init(){const r=this.shadowRoot.querySelector(".card"),o=(t,e)=>{const s=e.clientWidth,a=e.clientHeight,d=Math.abs(t.offsetX/10)-s/20,c=Math.abs(t.offsetY/10)-a/20,l=e.classList.contains("flipped");if(!e.classList.contains("moving")){const p=Math.abs(t.offsetX/4)/s*100,f=Math.abs(t.offsetY/1.5)/a*100;e.style.setProperty("--bpx",`${p}%`),e.style.setProperty("--bpy",`${f}%`),e.style.setProperty("--ry",`${l?180-d:-d}deg`),e.style.setProperty("--rx",`${-c}deg`)}},i=()=>{r.classList.add("moving"),r.style.setProperty("transition","transform 0.5s");const t=r.classList.contains("flipped");r.style.setProperty("--ry",t?"360deg":"180deg"),setTimeout(()=>{r.classList.toggle("flipped")},200),setTimeout(()=>{r.classList.remove("moving"),r.style.setProperty("transition","none")},500)};r.addEventListener("mousemove",t=>{t.target===r&&o(t,r)}),r.addEventListener("click",t=>{t.target===r&&!r.classList.contains("moving")&&i()})}render(){this.shadowRoot.innerHTML=`
-    <style>${n.styles}</style>
+    `}connectedCallback(){this.title=this.getAttribute("title"),this.src=this.getAttribute("src"),this.background=this.getAttribute("background"),this.description=this.getAttribute("description"),this.style.setProperty("--background-image",`url(${this.background})`),this.render(),this.init()}init(){const e=this.shadowRoot.querySelector(".card"),o=t=>{const r=t.classList.contains("flipped");t.classList.contains("moving")||(t.style.setProperty("transition","transform 0.5s"),t.style.setProperty("--bpx","0%"),t.style.setProperty("--bpy","0%"),t.style.setProperty("--ry",`${r?180:0}deg`),t.style.setProperty("--rx",`${0}deg`),setTimeout(()=>{t.classList.remove("moving"),t.style.setProperty("transition","none")},500))},i=(t,r)=>{const n=r.clientWidth,c=r.clientHeight,d=Math.abs(t.offsetX/10)-n/20,l=Math.abs(t.offsetY/10)-c/20,p=r.classList.contains("flipped");if(!r.classList.contains("moving")){const f=Math.abs(t.offsetX/4)/n*100,g=Math.abs(t.offsetY/1.5)/c*100;r.style.setProperty("--bpx",`${f}%`),r.style.setProperty("--bpy",`${g}%`),r.style.setProperty("--ry",`${p?180-d:-d}deg`),r.style.setProperty("--rx",`${-l}deg`)}},s=()=>{e.classList.add("moving"),e.style.setProperty("transition","transform 0.5s");const t=e.classList.contains("flipped");e.style.setProperty("--ry",t?"360deg":"180deg"),setTimeout(()=>{e.classList.toggle("flipped")},200),setTimeout(()=>{e.classList.remove("moving"),e.style.setProperty("transition","none")},500)};e.addEventListener("mousemove",t=>{t.target===e&&i(t,e)}),e.addEventListener("mouseleave",()=>{o(e)}),e.addEventListener("click",t=>{t.target===e&&!e.classList.contains("moving")&&s()})}render(){this.shadowRoot.innerHTML=`
+    <style>${a.styles}</style>
     <div class="container-card"  >
       <div class="card">
         <h1>${this.title}</h1>
         <img class="sticker" src="${this.src}" alt="${this.title}">
         <p class="description">${this.description}</p>
       </div>
-    </div>`}}customElements.define("parallax-card",n);
+    </div>`}}customElements.define("parallax-card",a);
